@@ -4,61 +4,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        #scanner-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #messages {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        select, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 1em;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <h1>QR Code Scanner</h1>
-    <div id="scanner">
-        <video id="preview"></video>
+    <div>
+        <select id="languageSelector" onchange="changeLanguage(this.value)">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+        </select>
+    </div>
+    <div id="scanner-container">
+        <div id="qr-reader" style="width:100%;"></div>
     </div>
     <div id="messages"></div>
+    <button id="stop-button" onclick="stopScanner()">Stop Scanner</button>
+    <button id="start-button" onclick="startScanner()">Start Scanner</button>
 
     <script>
-        // Improved error handling for QR code scanning
-        function handleError(error) {
-            const messagesDiv = document.getElementById('messages');
-            switch (error.name) {
-                case 'NotAllowedError':
-                    messagesDiv.innerText = 'Camera access denied. Please allow camera access.';
-                    break;
-                case 'NotFoundError':
-                    messagesDiv.innerText = 'No camera device found.';
-                    break;
-                case 'NotReadableError':
-                    messagesDiv.innerText = 'Camera is being used by another application.';
-                    break;
-                default:
-                    messagesDiv.innerText = 'An unknown error occurred.';
-            }
-        }
-
-        // Multi-language support
         const messages = {
             en: {
                 scanning: 'Scanning for QR codes...',
                 found: 'QR Code found: ',
-                error: 'Error occurred during scanning'
+                error: 'Error occurred during scanning',
+                stopped: 'Scanner stopped.',
+                started: 'Scanner started.'
             },
             es: {
                 scanning: 'Buscando códigos QR...',
                 found: 'Código QR encontrado: ',
-                error: 'Se produjo un error durante el escaneo'
+                error: 'Se produjo un error durante el escaneo',
+                stopped: 'Escáner detenido.',
+                started: 'Escáner iniciado.'
             }
         };
 
-        const currentLanguage = 'en';  // Set this based on user's preference
+        let currentLanguage = 'en';
+        let html5QrCode;
 
-        function displayMessage(key, value) {
+        function displayMessage(key, value = '') {
             const messagesDiv = document.getElementById('messages');
             messagesDiv.innerText = messages[currentLanguage][key] + value;
         }
 
-        // Example of starting the scanner
-        function startScanner() {
-            // ... Setup code for QR scanner
-            displayMessage('scanning', '');
-            // Handle QR code scanning logic
+        function changeLanguage(language) {
+            currentLanguage = language;
+            displayMessage('scanning');
         }
 
+        function startScanner() {
+            const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+                displayMessage('found', decodedText);
+                stopScanner(); // Stop scanner after finding the code
+            };
+
+            const qrCodeErrorCallback = (errorMessage) => {
+                // Optionally handle scan errors
+            };
+
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("qr-reader");
+            }
+
+            Html5Qrcode.getCameras().then((devices) => {
+                if (devices && devices.length) {
+                    const cameraId = devices[0].id;
+                    html5QrCode.start(cameraId, config, qrCodeSuccessCallback, qrCodeErrorCallback)
+                        .then(() => {
+                            displayMessage('started');
+                        })
+                        .catch((err) => {
+                            displayMessage('error', err);
+                        });
+                } else {
+                    displayMessage('error', 'No cameras found.');
+                }
+            }).catch((err) => {
+                displayMessage('error', err);
+            });
+        }
+
+        function stopScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    displayMessage('stopped');
+                }).catch((err) => {
+                    displayMessage('error', err);
+                });
+            }
+        }
+
+        // Start scanner automatically on load
         startScanner();
     </script>
 </body>
