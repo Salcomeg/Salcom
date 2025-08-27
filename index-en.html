@@ -6,7 +6,7 @@
   <title>Salcom - Hair Care Serum</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <style>
+ <style>
     html {
       box-sizing: border-box;
     }
@@ -35,6 +35,16 @@
       font-size: 1.2rem;
       color: #5a4d4d;
     }
+   function changeLanguage(lang) {
+  alert('Language button clicked: ' + lang); // أضف هذا السطر
+  if (lang === 'ar') {
+    window.location.href = 'index-ar.html';
+  } else if (lang === 'tr') {
+    window.location.href = 'index-tr.html';
+  } else {
+    window.location.href = 'index-en.html';
+  }
+}
     .lang-switch {
       text-align: center;
       margin-top: 1rem;
