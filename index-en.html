@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,12 +7,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
+    html {
+      box-sizing: border-box;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
     body {
       font-family: 'Cairo', sans-serif;
       margin: 0;
       padding: 0;
       background: #fff7f5;
       color: #333;
+      direction: ltr;
+      text-align: left;
     }
     header {
       background: #e0bfb8;
@@ -39,8 +47,13 @@
       color: white;
       border-radius: 6px;
       cursor: pointer;
+      transition: background 0.2s;
     }
-    .container {
+    .lang-switch button:focus {
+      outline: 2px solid #333;
+      outline-offset: 2px;
+    }
+    main.container {
       padding: 2rem;
       max-width: 1000px;
       margin: auto;
@@ -71,6 +84,11 @@
       border-radius: 8px;
       cursor: pointer;
       margin: 0.5rem;
+      transition: background 0.2s;
+    }
+    .cta button:focus, .qr-scan-btn:focus {
+      outline: 2px solid #333;
+      outline-offset: 2px;
     }
     #qr-reader {
       width: 100%;
@@ -82,6 +100,27 @@
       text-align: center;
       font-weight: bold;
       margin-top: 1rem;
+      font-size: 18px;
+    }
+    .retry-btn {
+      display: none;
+      margin-top: 1rem;
+      background: #e0bfb8;
+      color: #b85c5c;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .retry-btn:focus {
+      outline: 2px solid #333;
+      outline-offset: 2px;
+    }
+    .qr-alert {
+      color: #b85c5c;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
     }
     footer {
       background: #e0bfb8;
@@ -92,6 +131,7 @@
     }
   </style>
   <script>
+    let qrReader = null;
     function changeLanguage(lang) {
       if (lang === 'ar') {
         window.location.href = 'index-ar.html';
@@ -102,70 +142,78 @@
       }
     }
 
-<div id="qr-reader" style="width:300px; display:none; margin: 20px auto;"></div>
-
-<div id="qr-result" 
-     style="margin-top: 20px; font-size: 18px; font-weight: bold; text-align: center;">
-</div>
-
-<div style="text-align:center; margin-top:20px;">
-  <button onclick="scanQR()" 
-          style="padding:10px 20px; font-size:16px; border:none; border-radius:8px; background:#007bff; color:#fff; cursor:pointer;">
-    Scan QR
-  </button>
-</div>
-
-<script src="https://unpkg.com/html5-qrcode"></script>
-<script>
-  function scanQR() {
-    document.getElementById("qr-reader").style.display = "block";
-    const qrReader = new Html5Qrcode("qr-reader");
-    qrReader.start(
-      { facingMode: "environment" },
-      { fps: 10, qrbox: 250 },
-      qrCodeMessage => {
-        qrReader.stop();
-        document.getElementById("qr-reader").style.display = "none";
-
-        const resultDiv = document.getElementById("qr-result");
-
-        if (qrCodeMessage === "GZL-2025-TR001" || 
-            qrCodeMessage === "https://salcomeg.github.io/Salcom/index-en.html") {
-          resultDiv.innerText = "✅ Verified: Original Salcom Product";
-          resultDiv.style.color = "green";
-        } else {
-          resultDiv.innerText = "❌ Invalid QR Code. Please check the packaging.";
-          resultDiv.style.color = "red";
-        }
-      },
-      errorMessage => {
-        console.warn(`QR Scan error: ${errorMessage}`);
+    function scanQR() {
+      const qrDiv = document.getElementById("qr-reader");
+      const resultDiv = document.getElementById("qr-result");
+      const retryBtn = document.getElementById("retry-btn");
+      qrDiv.style.display = "block";
+      retryBtn.style.display = "none";
+      resultDiv.innerText = "";
+      // Destroy previous instance if exists
+      if (qrReader) {
+        qrReader.clear().catch(()=>{});
+        qrReader = null;
       }
-    ).catch(err => {
-      console.error("Unable to start scanning", err);
-    });
-  }
-</script>
+      // Check browser support
+      if (!window.Html5Qrcode) {
+        resultDiv.innerText = "Sorry, your browser does not support QR reading.";
+        resultDiv.style.color = "#b85c5c";
+        qrDiv.style.display = "none";
+        return;
+      }
+      qrReader = new Html5Qrcode("qr-reader");
+      qrReader.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        qrCodeMessage => {
+          qrReader.stop().then(()=>{
+            qrDiv.style.display = "none";
+            retryBtn.style.display = "inline-block";
+          });
+          if (
+            qrCodeMessage.trim() === "GZL-2025-TR001" ||
+            qrCodeMessage.trim() === "https://salcomeg.github.io/Salcom/index-en.html"
+          ) {
+            resultDiv.innerText = "✅ Verified: Original Salcom Product";
+            resultDiv.style.color = "green";
+          } else {
+            resultDiv.innerText = "❌ Invalid QR Code. Please check the packaging.";
+            resultDiv.style.color = "red";
+          }
+        },
+        errorMessage => {
+          // Only show in console, don't annoy user
+        }
+      ).catch(err => {
+        resultDiv.innerText = "Unable to start scanning. Please make sure your camera is available or update your browser.";
+        resultDiv.style.color = "#b85c5c";
+        qrDiv.style.display = "none";
+      });
+    }
 
+    function retryQR() {
+      scanQR();
+    }
+  </script>
 </head>
 <body>
   <header>
     <h1>Salcom</h1>
     <p>High quality Turkish hair care products</p>
     <div class="lang-switch">
-      <button onclick="changeLanguage('en')">English</button>
-      <button onclick="changeLanguage('ar')">العربية</button>
-      <button onclick="changeLanguage('tr')">Türkçe</button>
+      <button onclick="changeLanguage('en')" aria-label="English">English</button>
+      <button onclick="changeLanguage('ar')" aria-label="العربية">العربية</button>
+      <button onclick="changeLanguage('tr')" aria-label="Turkish">Türkçe</button>
     </div>
   </header>
 
-  <div class="container">
+  <main class="container">
     <div class="product">
-      <h2>güzellik saçı</h2>
+      <h2>Therapeutic Hair Serum</h2>
       <p>Therapeutic serum for hair loss and hair regrowth stimulation</p>
       <ul>
         <li>Strengthens hair follicles and stimulates scalp blood flow</li>
-        <li>Includes: Argan, Keratin, Caffeine, Biotin, Garlic oil</li>
+        <li>Contains: Argan, Keratin, Caffeine, Biotin, Garlic oil</li>
         <li>Nutritious and effective formula licensed from Salcom Türkiye</li>
         <li>Used 3 times per week with no rinse after application</li>
         <li>Elegant packaging: 5 glass vials + applicator</li>
@@ -173,17 +221,19 @@
     </div>
 
     <div class="cta">
-      <button onclick="window.location.href='https://wa.me/201XXXXXXXXX'">Order Now via WhatsApp</button>
-      <button class="qr-scan-btn" onclick="scanQR()">Verify Product via QR Code</button>
-      <div id="qr-reader"></div>
-      <div id="qr-result"></div>
+      <button onclick="window.location.href='https://wa.me/201XXXXXXXXX'" aria-label="Order Now via WhatsApp">Order Now via WhatsApp</button>
+      <div class="qr-alert" id="qr-alert">You can verify the product by scanning the QR code on the package.</div>
+      <button class="qr-scan-btn" onclick="scanQR()" aria-label="Verify product via QR">Verify Product via QR</button>
+      <div id="qr-reader" aria-label="QR Code Reader"></div>
+      <div id="qr-result" role="status"></div>
+      <button id="retry-btn" class="retry-btn" onclick="retryQR()" aria-label="Retry">Retry</button>
     </div>
 
     <div class="product">
       <h2>More Products Coming Soon</h2>
       <p>Stay tuned for the latest hair care innovations from Salcom.</p>
     </div>
-  </div>
+  </main>
 
   <footer>
     &copy; 2025 Salcom Egypt. All rights reserved.
