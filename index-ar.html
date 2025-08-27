@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html ar="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>سالكوم - Hair Care Serum</title>
+  <title>سالكوم - سيروم العناية بالشعر</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
@@ -13,6 +13,8 @@
       padding: 0;
       background: #fff7f5;
       color: #333;
+      direction: rtl;
+      text-align: right;
     }
     header {
       background: #e0bfb8;
@@ -27,11 +29,11 @@
       font-size: 1.2rem;
       color: #5a4d4d;
     }
-    .ar-switch {
+    .lang-switch {
       text-align: center;
       margin-top: 1rem;
     }
-    .ar-switch button {
+    .lang-switch button {
       margin: 0 0.5rem;
       padding: 0.5rem 1rem;
       border: none;
@@ -56,7 +58,7 @@
       color: #b85c5c;
     }
     .product ul {
-      padding-left: 1.5rem;
+      padding-right: 1.5rem;
     }
     .cta {
       text-align: center;
@@ -82,6 +84,7 @@
       text-align: center;
       font-weight: bold;
       margin-top: 1rem;
+      font-size: 18px;
     }
     footer {
       background: #e0bfb8;
@@ -92,13 +95,13 @@
     }
   </style>
   <script>
-    function changeLanguage(ar) {
-      if (ar === 'ar') {
-        window.location.href = 'index-ar.html';
-      } else if (ar === 'tr') {
+    function changeLanguage(lang) {
+      if (lang === 'en') {
+        window.location.href = 'index-en.html';
+      } else if (lang === 'tr') {
         window.location.href = 'index-tr.html';
       } else {
-        window.location.href = 'index-en.html';
+        window.location.href = 'index-ar.html';
       }
     }
 
@@ -111,10 +114,17 @@
         qrCodeMessage => {
           qrReader.stop();
           document.getElementById("qr-reader").style.display = "none";
-          const resultText = qrCodeMessage === "GZL-2025-TR001" ?
-            "✅ تم التحقق: منتج أصلي" :
-            "❌ رمز غير صالح. يرجى التحقق من التغليف.";
-          document.getElementById("qr-result").innerText = resultText;
+
+          const resultDiv = document.getElementById("qr-result");
+
+          if (qrCodeMessage === "GZL-2025-TR001" || 
+              qrCodeMessage === "https://salcomeg.github.io/Salcom/index-en.html") {
+            resultDiv.innerText = "✅ تم التحقق: منتج سالكوم الأصلي";
+            resultDiv.style.color = "green";
+          } else {
+            resultDiv.innerText = "❌ كود QR غير صالح. يرجى التحقق من العبوة.";
+            resultDiv.style.color = "red";
+          }
         },
         errorMessage => {
           console.warn(`QR Scan error: ${errorMessage}`);
@@ -129,7 +139,7 @@
   <header>
     <h1>سالكوم</h1>
     <p>منتجات تركية عالية الجودة للعناية بالشعر</p>
-    <div class="ar-switch">
+    <div class="lang-switch">
       <button onclick="changeLanguage('en')">English</button>
       <button onclick="changeLanguage('ar')">العربية</button>
       <button onclick="changeLanguage('tr')">Türkçe</button>
@@ -138,32 +148,32 @@
 
   <div class="container">
     <div class="product">
-      <h2>güzellik saçı</h2>
-      <p>سيروم علاجي لتساقط الشعر وتحفيز نموه</p>
+      <h2>سيروم علاجي للشعر</h2>
+      <p>سيروم علاجي لتساقط الشعر وتحفيز نموه من جديد</p>
       <ul>
-        <li>يقوي بصيلات الشعر ويحفز تدفق الدم لفروة الرأس</li>
-        <li>يحتوي على: زيت الأرغان، كيراتين، كافيين، بيوتين، زيت الثوم</li>
-        <li>Nutritious and effective formula licensed from سالكوم Türkiye</li>
-        <li>يستخدم 3 مرات أسبوعياً دون غسل بعد الاستخدام</li>
-        <li>تغليف أنيق: 5 قنينات زجاجية + أداة تطبيق</li>
+        <li>يقوي بصيلات الشعر وينشط تدفق الدم في فروة الرأس</li>
+        <li>يحتوي على: الأرجان، الكيراتين، الكافيين، البيوتين، زيت الثوم</li>
+        <li>تركيبة غذائية وفعالة مرخصة من Salcom Türkiye</li>
+        <li>يُستخدم 3 مرات أسبوعيًا بدون شطف بعد الاستخدام</li>
+        <li>عبوة أنيقة: 5 أمبولات زجاجية + أداة للتطبيق</li>
       </ul>
     </div>
 
     <div class="cta">
       <button onclick="window.location.href='https://wa.me/201XXXXXXXXX'">اطلب الآن عبر واتساب</button>
-      <button class="qr-scan-btn" onclick="scanQR()">تحقق من المنتج عبر رمز QR</button>
+      <button class="qr-scan-btn" onclick="scanQR()">تحقق من المنتج عبر QR</button>
       <div id="qr-reader"></div>
       <div id="qr-result"></div>
     </div>
 
     <div class="product">
-      <h2>منتجات جديدة قادمة قريباً</h2>
-      <p>Stay tuned for the latest hair care innovations from سالكوم.</p>
+      <h2>منتجات جديدة قريبًا</h2>
+      <p>تابعونا لاكتشاف أحدث ابتكارات سالكوم في العناية بالشعر.</p>
     </div>
   </div>
 
   <footer>
-    &copy; 2025 سالكوم Egypt. All rights reserved.
+    &copy; 2025 سالكوم مصر. جميع الحقوق محفوظة.
   </footer>
 </body>
 </html>
