@@ -102,28 +102,51 @@
       }
     }
 
-    function scanQR() {
-      document.getElementById("qr-reader").style.display = "block";
-      const qrReader = new Html5Qrcode("qr-reader");
-      qrReader.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: 250 },
-        qrCodeMessage => {
-          qrReader.stop();
-          document.getElementById("qr-reader").style.display = "none";
-          const resultText = qrCodeMessage === "GZL-2025-TR001" ?
-            "✅ Verified: Original Product" :
-            "❌ Invalid QR Code. Please check the packaging.";
-          document.getElementById("qr-result").innerText = resultText;
-        },
-        errorMessage => {
-          console.warn(`QR Scan error: ${errorMessage}`);
+<div id="qr-reader" style="width:300px; display:none; margin: 20px auto;"></div>
+
+<div id="qr-result" 
+     style="margin-top: 20px; font-size: 18px; font-weight: bold; text-align: center;">
+</div>
+
+<div style="text-align:center; margin-top:20px;">
+  <button onclick="scanQR()" 
+          style="padding:10px 20px; font-size:16px; border:none; border-radius:8px; background:#007bff; color:#fff; cursor:pointer;">
+    Scan QR
+  </button>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+  function scanQR() {
+    document.getElementById("qr-reader").style.display = "block";
+    const qrReader = new Html5Qrcode("qr-reader");
+    qrReader.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: 250 },
+      qrCodeMessage => {
+        qrReader.stop();
+        document.getElementById("qr-reader").style.display = "none";
+
+        const resultDiv = document.getElementById("qr-result");
+
+        if (qrCodeMessage === "GZL-2025-TR001" || 
+            qrCodeMessage === "https://salcomeg.github.io/Salcom/index-en.html") {
+          resultDiv.innerText = "✅ Verified: Original Salcom Product";
+          resultDiv.style.color = "green";
+        } else {
+          resultDiv.innerText = "❌ Invalid QR Code. Please check the packaging.";
+          resultDiv.style.color = "red";
         }
-      ).catch(err => {
-        console.error("Unable to start scanning", err);
-      });
-    }
-  </script>
+      },
+      errorMessage => {
+        console.warn(`QR Scan error: ${errorMessage}`);
+      }
+    ).catch(err => {
+      console.error("Unable to start scanning", err);
+    });
+  }
+</script>
+
 </head>
 <body>
   <header>
