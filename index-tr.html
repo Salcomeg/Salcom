@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salcom - Hair Care Serum</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fff7f5;
+      color: #333;
+    }
+    header {
+      background: #e0bfb8;
+      padding: 2rem;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    header p {
+      font-size: 1.2rem;
+      color: #5a4d4d;
+    }
+    .lang-switch {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .lang-switch button {
+      margin: 0 0.5rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      background: #b85c5c;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .container {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .product {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .product h2 {
+      color: #b85c5c;
+    }
+    .product ul {
+      padding-left: 1.5rem;
+    }
+    .cta {
+      text-align: center;
+      margin: 2rem 0;
+    }
+    .cta button, .qr-scan-btn {
+      background: #b85c5c;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 0.5rem;
+    }
+    #qr-reader {
+      width: 100%;
+      max-width: 400px;
+      margin: 1rem auto;
+      display: none;
+    }
+    #qr-result {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+    footer {
+      background: #e0bfb8;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      color: #5a4d4d;
+    }
+  </style>
+  <script>
+    function changeLanguage(lang) {
+      if (lang === 'ar') {
+        window.location.href = 'index-ar.html';
+      } else if (lang === 'tr') {
+        window.location.href = 'index-tr.html';
+      } else {
+        window.location.href = 'index-en.html';
+      }
+    }
+
+    function scanQR() {
+      document.getElementById("qr-reader").style.display = "block";
+      const qrReader = new Html5Qrcode("qr-reader");
+      qrReader.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        qrCodeMessage => {
+          qrReader.stop();
+          document.getElementById("qr-reader").style.display = "none";
+          const resultText = qrCodeMessage === "GZL-2025-TR001" ?
+            "✅ Verified: Original Product" :
+            "❌ Invalid QR Code. Please check the packaging.";
+          document.getElementById("qr-result").innerText = resultText;
+        },
+        errorMessage => {
+          console.warn(`QR Scan error: ${errorMessage}`);
+        }
+      ).catch(err => {
+        console.error("Unable to start scanning", err);
+      });
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Salcom</h1>
+    <p>Yüksek kaliteli Türk saç bakım ürünleri</p>
+    <div class="lang-switch">
+      <button onclick="changeLanguage('en')">English</button>
+      <button onclick="changeLanguage('ar')">العربية</button>
+      <button onclick="changeLanguage('tr')">Türkçe</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="product">
+      <h2>güzellik saçı</h2>
+      <p>Saç dökülmesini önleyici ve saç büyümesini teşvik edici serum</p>
+      <ul>
+        <li>Saç köklerini güçlendirir ve kafa derisi kan dolaşımını artırır</li>
+        <li>İçerik: Argan, Keratin, Kafein, Biotin, Sarımsak yağı</li>
+        <li>Salcom Türkiye lisanslı besleyici ve etkili formül</li>
+        <li>Haftada 3 kez uygulanır, durulama gerekmez</li>
+        <li>Şık ambalaj: 5 cam şişe + uygulayıcı</li>
+      </ul>
+    </div>
+
+    <div class="cta">
+      <button onclick="window.location.href='https://wa.me/201XXXXXXXXX'">WhatsApp ile Şimdi Sipariş Ver</button>
+      <button class="qr-scan-btn" onclick="scanQR()">QR Kodu ile Ürünü Doğrula</button>
+      <div id="qr-reader"></div>
+      <div id="qr-result"></div>
+    </div>
+
+    <div class="product">
+      <h2>Yakında Daha Fazla Ürün</h2>
+      <p>Salcom'dan en son saç bakım yenilikleri için bizi takip edin.</p>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Salcom Türkiye. Tüm hakları saklıdır.
+  </footer>
+</body>
+</html>
