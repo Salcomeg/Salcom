@@ -1,169 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salcom - Hair Care Serum</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #fff7f5;
-      color: #333;
-    }
-    header {
-      background: #e0bfb8;
-      padding: 2rem;
-      text-align: center;
-    }
-    header h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-    }
-    header p {
-      font-size: 1.2rem;
-      color: #5a4d4d;
-    }
-    .lang-switch {
-      text-align: center;
-      margin-top: 1rem;
-    }
-    .lang-switch button {
-      margin: 0 0.5rem;
-      padding: 0.5rem 1rem;
-      border: none;
-      background: #b85c5c;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .container {
-      padding: 2rem;
-      max-width: 1000px;
-      margin: auto;
-    }
-    .product {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      padding: 2rem;
-      margin-bottom: 2rem;
-    }
-    .product h2 {
-      color: #b85c5c;
-    }
-    .product ul {
-      padding-left: 1.5rem;
-    }
-    .cta {
-      text-align: center;
-      margin: 2rem 0;
-    }
-    .cta button, .qr-scan-btn {
-      background: #b85c5c;
-      color: white;
-      border: none;
-      padding: 1rem 2rem;
-      font-size: 1.1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      margin: 0.5rem;
-    }
-    #qr-reader {
-      width: 100%;
-      max-width: 400px;
-      margin: 1rem auto;
-      display: none;
-    }
-    #qr-result {
-      text-align: center;
-      font-weight: bold;
-      margin-top: 1rem;
-    }
-    footer {
-      background: #e0bfb8;
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.9rem;
-      color: #5a4d4d;
-    }
-  </style>
-  <script>
-    function changeLanguage(lang) {
-      if (lang === 'ar') {
-        window.location.href = 'index-ar.html';
-      } else if (lang === 'tr') {
-        window.location.href = 'index-tr.html';
-      } else {
-        window.location.href = 'index-en.html';
-      }
-    }
-
-    function scanQR() {
-      document.getElementById("qr-reader").style.display = "block";
-      const qrReader = new Html5Qrcode("qr-reader");
-      qrReader.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: 250 },
-        qrCodeMessage => {
-          qrReader.stop();
-          document.getElementById("qr-reader").style.display = "none";
-          const resultText = qrCodeMessage === "GZL-2025-TR001" ?
-            "✅ Verified: Original Product" :
-            "❌ Invalid QR Code. Please check the packaging.";
-          document.getElementById("qr-result").innerText = resultText;
-        },
-        errorMessage => {
-          console.warn(`QR Scan error: ${errorMessage}`);
-        }
-      ).catch(err => {
-        console.error("Unable to start scanning", err);
-      });
-    }
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
 </head>
 <body>
-  <header>
-    <h1>Salcom</h1>
-    <p>High quality Turkish hair care products</p>
-    <div class="lang-switch">
-      <button onclick="changeLanguage('en')">English</button>
-      <button onclick="changeLanguage('ar')">العربية</button>
-      <button onclick="changeLanguage('tr')">Türkçe</button>
+    <h1>QR Code Scanner</h1>
+    <div id="scanner">
+        <video id="preview"></video>
     </div>
-  </header>
+    <div id="messages"></div>
 
-  <div class="container">
-    <div class="product">
-      <h2>güzellik saçı</h2>
-      <p>Therapeutic serum for hair loss and hair regrowth stimulation</p>
-      <ul>
-        <li>Strengthens hair follicles and stimulates scalp blood flow</li>
-        <li>Includes: Argan, Keratin, Caffeine, Biotin, Garlic oil</li>
-        <li>Nutritious and effective formula licensed from Salcom Türkiye</li>
-        <li>Used 3 times per week with no rinse after application</li>
-        <li>Elegant packaging: 5 glass vials + applicator</li>
-      </ul>
-    </div>
+    <script>
+        // Improved error handling for QR code scanning
+        function handleError(error) {
+            const messagesDiv = document.getElementById('messages');
+            switch (error.name) {
+                case 'NotAllowedError':
+                    messagesDiv.innerText = 'Camera access denied. Please allow camera access.';
+                    break;
+                case 'NotFoundError':
+                    messagesDiv.innerText = 'No camera device found.';
+                    break;
+                case 'NotReadableError':
+                    messagesDiv.innerText = 'Camera is being used by another application.';
+                    break;
+                default:
+                    messagesDiv.innerText = 'An unknown error occurred.';
+            }
+        }
 
-    <div class="cta">
-      <button onclick="window.location.href='https://wa.me/201XXXXXXXXX'">Order Now via WhatsApp</button>
-      <button class="qr-scan-btn" onclick="scanQR()">Verify Product via QR Code</button>
-      <div id="qr-reader"></div>
-      <div id="qr-result"></div>
-    </div>
+        // Multi-language support
+        const messages = {
+            en: {
+                scanning: 'Scanning for QR codes...',
+                found: 'QR Code found: ',
+                error: 'Error occurred during scanning'
+            },
+            es: {
+                scanning: 'Buscando códigos QR...',
+                found: 'Código QR encontrado: ',
+                error: 'Se produjo un error durante el escaneo'
+            }
+        };
 
-    <div class="product">
-      <h2>More Products Coming Soon</h2>
-      <p>Stay tuned for the latest hair care innovations from Salcom.</p>
-    </div>
-  </div>
+        const currentLanguage = 'en';  // Set this based on user's preference
 
-  <footer>
-    &copy; 2025 Salcom Egypt. All rights reserved.
-  </footer>
+        function displayMessage(key, value) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerText = messages[currentLanguage][key] + value;
+        }
+
+        // Example of starting the scanner
+        function startScanner() {
+            // ... Setup code for QR scanner
+            displayMessage('scanning', '');
+            // Handle QR code scanning logic
+        }
+
+        startScanner();
+    </script>
 </body>
 </html>
